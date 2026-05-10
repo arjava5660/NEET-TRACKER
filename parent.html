@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEET Study Tracker — Dashboard</title>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #fff;
+  --border: #e2e0d8;
+  --text: #1a1a18;
+  --muted: #6b6960;
+  --hint: #9e9b91;
+  --blue: #1a5fa8;
+  --green: #2a7a3b;
+  --amber: #7a4f00;
+  --red: #a02020;
+  --purple: #5b2d8e;
+  --teal: #0f6b6b;
+  --orange: #8a3a00;
+  --radius: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+.header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-top { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.logo { width: 48px; height: 48px; background: linear-gradient(135deg, var(--green), var(--blue)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.title { font-size: 22px; font-weight: 700; }
+.subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.header-right { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.header-btn { font-size: 12px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); cursor: pointer; font-weight: 500; transition: all 0.15s; }
+.header-btn:hover { background: var(--card); border-color: var(--blue); color: var(--blue); }
+.header-btn.danger { color: var(--red); border-color: #f0a0a0; }
+.header-btn.danger:hover { background: #fdeaea; border-color: var(--red); }
+
+.main { padding: 20px 24px; max-width: 1200px; margin: 0 auto; }
+.section { margin-bottom: 28px; }
+.section-title { font-size: 16px; font-weight: 600; margin-bottom: 14px; color: var(--text); }
+
+.subject-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.subject-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all 0.2s; text-decoration: none; color: var(--text); display: block; }
+.subject-card:hover { border-color: var(--blue); box-shadow: 0 2px 8px rgba(26,95,168,0.12); transform: translateY(-2px); }
+.subject-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.subject-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.subject-name { font-size: 15px; font-weight: 600; flex: 1; }
+.subject-pct { font-size: 20px; font-weight: 700; color: var(--green); }
+.progress-bar { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 8px; }
+.progress-fill { height: 6px; border-radius: 3px; transition: width 0.3s; }
+.subject-meta { font-size: 12px; color: var(--muted); }
+
+.rev-list { display: flex; flex-direction: column; gap: 8px; }
+.rev-item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+.rev-day { font-size: 11px; font-weight: 700; color: var(--orange); background: #fff0e0; border-radius: 6px; padding: 3px 8px; }
+.rev-info { flex: 1; }
+.rev-chapter { font-size: 14px; font-weight: 500; }
+.rev-subject { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.rev-check { width: 24px; height: 24px; border-radius: 6px; border: 1.5px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.rev-check:hover { border-color: var(--orange); background: #fff0e0; }
+.rev-check.done { background: var(--orange); border-color: var(--orange); }
+.rev-empty { text-align: center; padding: 20px; color: var(--hint); font-size: 13px; }
+
+.task-list { display: flex; flex-direction: column; gap: 8px; }
+.task-item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+.task-check { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--border); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.task-check:hover { border-color: var(--green); }
+.task-check.done { background: var(--green); border-color: var(--green); }
+.task-text { flex: 1; font-size: 14px; }
+.task-text.done { text-decoration: line-through; opacity: 0.5; }
+.task-delete { font-size: 16px; color: var(--muted); cursor: pointer; padding: 2px; }
+.task-delete:hover { color: var(--red); }
+.task-add { display: flex; gap: 8px; margin-top: 8px; }
+.task-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; }
+.task-input:focus { border-color: var(--blue); }
+.task-btn { padding: 8px 16px; border-radius: 8px; border: none; background: var(--blue); color: #fff; font-size: 13px; font-weight: 500; cursor: pointer; }
+.task-btn:hover { background: #164d8f; }
+
+.tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.tip-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+.tip-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--blue); }
+.tip-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; }
+.modal.open { display: flex; }
+.modal-box { background: var(--card); border-radius: var(--radius); padding: 24px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+.modal-title { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+.modal-section { margin-bottom: 20px; }
+.modal-section-title { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 10px; }
+.chapter-edit { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.chapter-edit-name { flex: 1; font-size: 12px; color: var(--muted); }
+.chapter-edit-input { width: 60px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; text-align: center; }
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.modal-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); font-size: 13px; cursor: pointer; }
+.modal-btn:hover { background: var(--card); }
+.modal-btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+.modal-btn.primary:hover { background: #164d8f; }
+
+input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="logo">🎯</div>
+    <div>
+      <div class="title">NEET Study Tracker</div>
+      <div class="subtitle">Dashboard for your subject progress and backups</div>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" onclick="openSettings()">⚙️ Settings</button>
+      <button class="header-btn" onclick="backupData()">💾 Backup</button>
+      <label for="restore-file" class="header-btn" style="margin:0;cursor:pointer">📂 Restore</label>
+      <input type="file" id="restore-file" accept=".json" onchange="restoreData(event)">
+      <button class="header-btn danger" onclick="resetAll()">🗑️ Reset All</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="section">
+    <div class="section-title">📚 All Subjects</div>
+    <div class="subject-grid" id="subject-grid"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🔁 Today's Revision Schedule</div>
+    <div class="rev-list" id="rev-list"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">✅ Today's Tasks</div>
+    <div class="task-list" id="task-list"></div>
+    <div class="task-add">
+      <input type="text" class="task-input" id="task-input" placeholder="Add a task..." onkeypress="if(event.key==='Enter')addTask()">
+      <button class="task-btn" onclick="addTask()">+ Add</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">💡 Study Tips</div>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-title">Space Your Revisions</div>
+        <div class="tip-text">The Day 1, 3, 5, 8, 15, 30, 50 schedule is best for long-term retention.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title">Backup Your Progress</div>
+        <div class="tip-text">Use Backup before clearing browser history or switching devices.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title">Track Weak Topics</div>
+        <div class="tip-text">Use tasks and revision notes to focus on chapters you keep missing.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-title">Use the Subject Links</div>
+        <div class="tip-text">Open each tracker page from the dashboard and mark checkboxes there.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="settings-modal">
+  <div class="modal-box">
+    <div class="modal-title">⚙️ Settings — Edit Lecture Counts</div>
+    <div id="settings-content"></div>
+    <div class="modal-btns">
+      <button class="modal-btn" onclick="closeSettings()">Cancel</button>
+      <button class="modal-btn primary" onclick="saveSettings()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUBJECTS = [
+  { key: 'neet_phy', name: 'Physics', icon: '⚡', color: '#1a5fa8', path: 'physics/phy.html' },
+  { key: 'neet_chem_organic', name: 'Organic Chemistry', icon: '🧪', color: '#2a7a3b', path: 'chem_organic/orga.html' },
+  { key: 'neet_chem_physical', name: 'Physical Chemistry', icon: '⚗️', color: '#7a4f00', path: 'chem_physical/physicall.html' },
+  { key: 'neet_chem_inorganic', name: 'Inorganic Chemistry', icon: '🔬', color: '#5b2d8e', path: 'inorganic_chem/inor.html' },
+  { key: 'neet_botany', name: 'Botany', icon: '🌿', color: '#2a7a3b', path: 'botany/bota.html' },
+  { key: 'neet_zoology', name: 'Zoology', icon: '🦎', color: '#8a3a00', path: 'zoology/zoo.html' },
+];
+
+const CHAPTER_DEFS = {
+  neet_phy: [
+    "Basic maths", "Vector", "Unit and dimensions", "Motion in a straight line",
+    "Motion in a plane", "Laws of motion", "Work, energy and power",
+    "Centre of mass", "Rotational motion", "Gravitation", "Solids",
+    "Fluids", "Thermal properties of matter", "Thermodynamics",
+    "Kinetic theory", "Waves", "Oscillations", "Electric charge and fields",
+    "Electrostatics and capacitance", "Current electricity",
+    "Moving charge and magnetism", "Magnetism and matter",
+    "Electromagnetic induction", "AC", "EM waves", "Ray optics",
+    "Wave optics", "Dual nature of radiation and matter",
+    "Atoms", "Nuclei", "Semiconductor"
+  ],
+  neet_chem_physical: [
+    "Atomic Structure", "Some Basic Concepts of Chemistry",
+    "Thermodynamics", "Chemical Equilibrium", "Ionic Equilibrium",
+    "Redox Reactions", "Solutions", "Electrochemistry",
+    "Chemical Kinetics", "Practical Chemistry"
+  ],
+  neet_chem_organic: [
+    "IUPAC Nomenclature", "Isomerism", "GOC (General Organic Chemistry)",
+    "Hydrocarbons", "Haloalkane and Haloarene", "Alcohol, Phenol and Ether",
+    "Carboxylic Acid and Ester", "Amine", "Biomolecules", "Purification Techniques"
+  ],
+  neet_chem_inorganic: [
+    "Periodic Table", "Chemical Bonding", "P-Block Elements",
+    "D and F Block Elements", "Salt Analysis", "Coordination Compounds"
+  ],
+  neet_botany: [
+    "Cell: The Unit of Life", "Cell Cycle and Cell Division",
+    "The Living World", "Biological Classification", "Plant Kingdom",
+    "Morphology of Flowering Plants", "Anatomy of Flowering Plants",
+    "Photosynthesis in Higher Plants", "Respiration in Plants",
+    "Plant Growth and Development", "Sexual Reproduction in Flowering Plants",
+    "Organisms and Population", "Ecosystem", "Biodiversity and Conservation",
+    "Microbes in Human Welfare", "Principles of Inheritance and Variation",
+    "Molecular Basis of Inheritance"
+  ],
+  neet_zoology: [
+    "Structural Organisation in Animals", "Animal Kingdom", "Biomolecules",
+    "Breathing and Exchange of Gases", "Body Fluids and Circulation",
+    "Excretory Products and Elimination", "Locomotion and Movement",
+    "Neural Control and Coordination", "Chemical Coordination and Integration",
+    "Human Reproduction", "Reproductive Health", "Evolution",
+    "Human Health and Diseases", "Biotechnology Principles and Process",
+    "Biotechnology and Its Applications"
+  ]
+};
+
+const TODAY = new Date().toISOString().slice(0, 10);
+const TASKS_KEY = 'neet_tasks';
+const REV_DAYS = [1, 3, 5, 8, 15, 30, 50];
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function getSubjectData(key) {
+  try { return JSON.parse(localStorage.getItem(key)) || {}; } catch { return {}; }
+}
+
+function getChapterLecCount(subjectKey, chIndex) {
+  const data = getSubjectData(subjectKey);
+  const lecKey = `ch${chIndex}_lec_count`;
+  if (typeof data[lecKey] === 'number') return data[lecKey];
+  if (data[lecKey]) return Number(data[lecKey]) || 10;
+  const def = CHAPTER_DEFS[subjectKey] && CHAPTER_DEFS[subjectKey][chIndex];
+  return def ? 10 : 10;
+}
+
+function calculateProgress(subjectKey) {
+  const data = getSubjectData(subjectKey);
+  const chapters = CHAPTER_DEFS[subjectKey] || [];
+  let total = 0, done = 0;
+  chapters.forEach((ch, ci) => {
+    const lec = getChapterLecCount(subjectKey, ci);
+    for (let i = 0; i < lec; i++) {
+      total++; if (data[`ch${ci}_lec_${i}`]) done++;
+      total++; if (data[`ch${ci}_dpp_${i}`]) done++;
+    }
+    total += 4;
+    if (data[`ch${ci}_kneet_0`]) done++;
+    if (data[`ch${ci}_kneet_1`]) done++;
+    if (data[`ch${ci}_pyqneet_0`]) done++;
+    if (data[`ch${ci}_pyqjee_0`]) done++;
+    total++;
+    if (data[`ch${ci}_ncert_0`]) done++;
+    total += REV_DAYS.length;
+    REV_DAYS.forEach(day => { if (data[`ch${ci}_rev_d${day}`]) done++; });
+  });
+  return total ? Math.round(done / total * 100) : 0;
+}
+
+function renderSubjects() {
+  const grid = document.getElementById('subject-grid');
+  grid.innerHTML = SUBJECTS.map(s => {
+    const pct = calculateProgress(s.key);
+    return `<a href="${s.path}" class="subject-card">
+      <div class="subject-header">
+        <div class="subject-icon" style="background:${s.color}22;color:${s.color}">${s.icon}</div>
+        <div class="subject-name">${s.name}</div>
+        <div class="subject-pct">${pct}%</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${s.color}"></div></div>
+      <div class="subject-meta">${(CHAPTER_DEFS[s.key] || []).length} chapters</div>
+    </a>`;
+  }).join('');
+}
+
+function getTodayRevisions() {
+  const revs = [];
+  SUBJECTS.forEach(s => {
+    const data = getSubjectData(s.key);
+    const chapters = CHAPTER_DEFS[s.key] || [];
+    chapters.forEach((ch, ci) => {
+      const compDate = data[`ch${ci}_completedDate`];
+      if (!compDate) return;
+      REV_DAYS.forEach(day => {
+        const targetDate = addDays(compDate, day);
+        if (targetDate === TODAY) {
+          revs.push({ subjectKey: s.key, subjectName: s.name, chIndex: ci, chName: ch, day, done: data[`ch${ci}_rev_d${day}`] });
+        }
+      });
+    });
+  });
+  return revs;
+}
+
+function toggleRevision(subjectKey, chIndex, day) {
+  const data = getSubjectData(subjectKey);
+  const key = `ch${chIndex}_rev_d${day}`;
+  data[key] = !data[key];
+  localStorage.setItem(subjectKey, JSON.stringify(data));
+  renderRevisions();
+  renderSubjects();
+}
+
+function renderRevisions() {
+  const list = document.getElementById('rev-list');
+  const revs = getTodayRevisions();
+  if (!revs.length) {
+    list.innerHTML = '<div class="rev-empty">✨ No revisions due today.</div>';
+    return;
+  }
+  list.innerHTML = revs.map(r => `
+    <div class="rev-item">
+      <div class="rev-day">Day ${r.day}</div>
+      <div class="rev-info">
+        <div class="rev-chapter">${r.chName}</div>
+        <div class="rev-subject">${r.subjectName}</div>
+      </div>
+      <div class="rev-check ${r.done ? 'done' : ''}" onclick="toggleRevision('${r.subjectKey}', ${r.chIndex}, ${r.day})">
+        ${r.done ? '<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadTasks() {
+  try { return JSON.parse(localStorage.getItem(TASKS_KEY)) || []; } catch { return []; }
+}
+function saveTasks(tasks) { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)); }
+
+function addTask() {
+  const input = document.getElementById('task-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const tasks = loadTasks();
+  tasks.push({ text, done: false, id: Date.now() });
+  saveTasks(tasks);
+  input.value = '';
+  renderTasks();
+}
+
+function toggleTask(id) {
+  const tasks = loadTasks();
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  task.done = !task.done;
+  saveTasks(tasks);
+  renderTasks();
+}
+
+function deleteTask(id) {
+  const tasks = loadTasks().filter(t => t.id !== id);
+  saveTasks(tasks);
+  renderTasks();
+}
+
+function renderTasks() {
+  const list = document.getElementById('task-list');
+  const tasks = loadTasks();
+  list.innerHTML = tasks.map(t => `
+    <div class="task-item">
+      <div class="task-check ${t.done ? 'done' : ''}" onclick="toggleTask(${t.id})">
+        ${t.done ? '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+      </div>
+      <div class="task-text ${t.done ? 'done' : ''}">${t.text}</div>
+      <div class="task-delete" onclick="deleteTask(${t.id})">✕</div>
+    </div>
+  `).join('');
+}
+
+function openSettings() {
+  const content = document.getElementById('settings-content');
+  content.innerHTML = SUBJECTS.map(s => {
+    const chapters = CHAPTER_DEFS[s.key] || [];
+    return `<div class="modal-section">
+      <div class="modal-section-title">${s.icon} ${s.name}</div>
+      ${chapters.map((ch, ci) => {
+        const lec = getChapterLecCount(s.key, ci);
+        return `<div class="chapter-edit">
+          <div class="chapter-edit-name">${ch}</div>
+          <input type="number" class="chapter-edit-input" id="lec-${s.key}-${ci}" value="${lec}" min="1" max="50">
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+  document.getElementById('settings-modal').classList.add('open');
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('open');
+}
+
+function saveSettings() {
+  SUBJECTS.forEach(s => {
+    const data = getSubjectData(s.key);
+    const chapters = CHAPTER_DEFS[s.key] || [];
+    chapters.forEach((_, ci) => {
+      const input = document.getElementById(`lec-${s.key}-${ci}`);
+      if (!input) return;
+      data[`ch${ci}_lec_count`] = Number(input.value) || 10;
+    });
+    localStorage.setItem(s.key, JSON.stringify(data));
+  });
+  closeSettings();
+  renderSubjects();
+  alert('Lecture counts saved.');
+}
+
+function backupData() {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+  const allData = {};
+  SUBJECTS.forEach(s => { allData[s.key] = getSubjectData(s.key); });
+  allData[TASKS_KEY] = loadTasks();
+  const backup = { timestamp, data: allData };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `neet_backup_${timestamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  alert('Backup created. Save this JSON file safely.');
+}
+
+function restoreData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.data) throw new Error('Invalid backup file');
+      Object.keys(backup.data).forEach(key => {
+        localStorage.setItem(key, JSON.stringify(backup.data[key]));
+      });
+      alert('Restore complete.');
+      location.reload();
+    } catch (err) {
+      alert('Restore failed: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (!confirm('Reset ALL progress across all subjects? This cannot be undone.')) return;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+  const allData = {};
+  SUBJECTS.forEach(s => { allData[s.key] = getSubjectData(s.key); });
+  allData[TASKS_KEY] = loadTasks();
+  const backup = { timestamp, data: allData };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `neet_backup_before_reset_${timestamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  setTimeout(() => {
+    SUBJECTS.forEach(s => localStorage.removeItem(s.key));
+    localStorage.removeItem(TASKS_KEY);
+    alert('All data reset. Backup downloaded automatically.');
+    location.reload();
+  }, 300);
+}
+
+renderSubjects();
+renderRevisions();
+renderTasks();
+</script>
+</body>
+</html>

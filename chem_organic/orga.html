@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organic Chemistry — NEET Tracker</title>
+<style>
+  :root {
+    --bg: #f7f6f2;
+    --card: #ffffff;
+    --border: #e2e0d8;
+    --border2: #ccc9be;
+    --text: #1a1a18;
+    --muted: #6b6960;
+    --hint: #9e9b91;
+    --blue: #1a5fa8;
+    --blue-bg: #e8f0fb;
+    --blue-border: #a8c4f0;
+    --green: #2a7a3b;
+    --green-bg: #e6f4ea;
+    --green-border: #90d09e;
+    --green-dark: #1a5c28;
+    --amber: #7a4f00;
+    --amber-bg: #fef3e0;
+    --amber-border: #f5c842;
+    --purple: #5b2d8e;
+    --purple-bg: #f1eaff;
+    --purple-border: #c4a0f0;
+    --red: #a02020;
+    --red-bg: #fdeaea;
+    --red-border: #f0a0a0;
+    --teal: #0f6b6b;
+    --teal-bg: #e0f5f5;
+    --teal-border: #80d0d0;
+    --orange: #8a3a00;
+    --orange-bg: #fff0e0;
+    --orange-border: #ffb060;
+    --complete-bg: #d4edda;
+    --complete-border: #4caf72;
+    --complete-head: #e8f5ec;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 14px 24px; display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .topbar-icon { width: 36px; height: 36px; background: var(--green-bg); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .topbar-title { font-size: 17px; font-weight: 600; }
+  .topbar-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .overall-bar-wrap { width: 160px; }
+  .overall-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .bar-track { height: 6px; background: var(--border); border-radius: 3px; }
+  .bar-fill { height: 6px; background: var(--green); border-radius: 3px; transition: width 0.3s; }
+  .reset-btn { font-size: 12px; color: var(--red); border: 1px solid var(--red-border); background: var(--red-bg); border-radius: var(--radius-sm); padding: 5px 12px; cursor: pointer; }
+  .reset-btn:hover { background: #fbd5d5; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; padding: 10px 24px; background: var(--card); border-bottom: 1px solid var(--border); font-size: 11px; color: var(--muted); }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-dot { width: 11px; height: 11px; border-radius: 3px; }
+
+  /* ── MAIN ── */
+  .main { padding: 20px 24px; max-width: 1100px; margin: 0 auto; }
+
+  /* ── CHAPTER CARD ── */
+  .chapter-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; overflow: hidden; transition: border-color 0.3s, box-shadow 0.3s; }
+  .chapter-card.completed { border-color: var(--complete-border); box-shadow: 0 0 0 2px #c8eed633; }
+
+  /* ── DROPDOWN 1 HEADER ── */
+  .chapter-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 18px; cursor: pointer; user-select: none; transition: background 0.15s;
+  }
+  .chapter-head:hover { background: var(--bg); }
+  .chapter-card.completed .chapter-head { background: var(--complete-head); }
+  .ch-num { width: 28px; height: 28px; border-radius: 50%; background: var(--green-bg); color: var(--green); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.3s, color 0.3s; }
+  .chapter-card.completed .ch-num { background: var(--green); color: #fff; }
+  .ch-name { font-size: 15px; font-weight: 600; flex: 1; }
+  .ch-complete-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--complete-bg); color: var(--green-dark); border: 1px solid var(--complete-border); font-weight: 600; display: none; }
+  .chapter-card.completed .ch-complete-badge { display: inline-block; }
+  .ch-mini-stats { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .mini-pill { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+  .pill-lec   { background: var(--blue-bg);   color: var(--blue);   border: 1px solid var(--blue-border); }
+  .pill-dpp   { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+  .pill-kneet { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-border); }
+  .pill-pyq   { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+  .chevron { color: var(--hint); font-size: 13px; transition: transform 0.2s; margin-left: 4px; }
+  .chevron.open { transform: rotate(180deg); }
+
+  /* ── PROGRESS BAR ── */
+  .ch-progress { height: 3px; background: var(--border); }
+  .ch-progress-fill { height: 3px; background: var(--green); transition: width 0.3s; }
+  .chapter-card.completed .ch-progress-fill { background: var(--complete-border); }
+
+  /* ── DROPDOWN 1 BODY ── */
+  .chapter-body { display: none; border-top: 1px solid var(--border); }
+  .chapter-body.open { display: block; }
+
+  /* ── DROPDOWN 2 HEADER (Study Planner) ── */
+  .planner-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 18px; cursor: pointer; user-select: none;
+    background: var(--bg); border-top: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .planner-head:hover { background: #eeede8; }
+  .planner-label { font-size: 13px; font-weight: 600; color: var(--teal); flex: 1; }
+  .planner-sub { font-size: 11px; color: var(--muted); }
+
+  /* ── DROPDOWN 2 BODY ── */
+  .planner-body { display: none; border-top: 1px solid var(--border); background: #fafaf7; }
+  .planner-body.open { display: block; }
+
+  /* ── SECTION BLOCKS ── */
+  .section-block { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+  .section-block:last-child { border-bottom: none; }
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+
+  /* ── CHECK GRID ── */
+  .check-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .check-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .check-box { width: 34px; height: 34px; border-radius: var(--radius-sm); border: 1.5px solid var(--border2); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.15s; }
+  .check-box:hover { border-color: #aaa; background: var(--bg); }
+  .check-box.done-lec      { background: var(--blue-bg);    border-color: var(--blue);   }
+  .check-box.done-dpp      { background: var(--green-bg);   border-color: var(--green);  }
+  .check-box.done-kneet    { background: var(--purple-bg);  border-color: var(--purple); }
+  .check-box.done-pyq-neet { background: var(--amber-bg);   border-color: var(--amber);  }
+  .check-box.done-pyq-jee  { background: var(--red-bg);     border-color: var(--red);    }
+  .check-box.done-ncert    { background: var(--teal-bg);    border-color: var(--teal);   }
+  .check-box.done-rev      { background: var(--orange-bg);  border-color: var(--orange); }
+  .check-label { font-size: 10px; color: var(--muted); text-align: center; }
+  .tick { display: none; }
+  .check-box.done-lec .tick,
+  .check-box.done-dpp .tick,
+  .check-box.done-kneet .tick,
+  .check-box.done-pyq-neet .tick,
+  .check-box.done-pyq-jee .tick,
+  .check-box.done-ncert .tick,
+  .check-box.done-rev .tick { display: block; }
+
+  /* ── PYQ ROW ── */
+  .pyq-row { display: flex; gap: 20px; flex-wrap: wrap; }
+  .pyq-col { display: flex; flex-direction: column; gap: 6px; }
+  .pyq-col-label { font-size: 11px; font-weight: 600; }
+
+  /* ── NCERT ── */
+  .ncert-row { display: flex; align-items: center; gap: 14px; }
+  .ncert-box { width: 44px; height: 44px; border-radius: 8px; border: 1.5px solid var(--border2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+  .ncert-box:hover { border-color: var(--teal); background: var(--teal-bg); }
+  .ncert-box.done-ncert { background: var(--teal-bg); border-color: var(--teal); }
+  .ncert-desc { font-size: 13px; color: var(--muted); }
+
+  /* ── REVISION PLANNER ── */
+  .rev-locked { font-size: 13px; color: var(--hint); padding: 4px 0; display: flex; align-items: center; gap: 8px; }
+  .rev-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .rev-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .rev-box { width: 52px; height: 52px; border-radius: 8px; border: 1.5px solid var(--border2); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; transition: all 0.15s; }
+  .rev-box:hover:not(.rev-locked-box) { border-color: var(--orange); background: var(--orange-bg); }
+  .rev-box.done-rev { background: var(--orange-bg); border-color: var(--orange); }
+  .rev-box.rev-locked-box { opacity: 0.35; cursor: not-allowed; }
+  .rev-day-label { font-size: 10px; font-weight: 700; color: var(--orange); }
+  .rev-date-label { font-size: 9px; color: var(--muted); }
+  .rev-item-label { font-size: 10px; color: var(--muted); text-align: center; }
+  .rev-date-display { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .rev-completed-date { font-size: 11px; color: var(--green); font-weight: 500; margin-top: 2px; }
+
+  /* ── NOTES ── */
+  .notes-input { width: 100%; min-height: 60px; resize: vertical; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; font-family: inherit; font-size: 13px; background: var(--bg); color: var(--text); outline: none; transition: border 0.15s; }
+  .notes-input:focus { border-color: var(--green); }
+  .notes-hint { font-size: 11px; color: var(--hint); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-icon">🧪</div>
+  <div>
+    <div class="topbar-title">Organic Chemistry — NEET Tracker</div>
+    <div class="topbar-sub">10 Chapters</div>
+  </div>
+  <div class="topbar-right">
+    <div class="overall-bar-wrap">
+      <div class="overall-label"><span>Overall</span><span id="overall-pct">0%</span></div>
+      <div class="bar-track"><div class="bar-fill" id="overall-bar" style="width:0%"></div></div>
+    </div>
+    <button class="reset-btn" onclick="confirmReset()">Reset all</button>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#e8f0fb;border:1px solid #a8c4f0"></div> Lecture</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#e6f4ea;border:1px solid #90d09e"></div> DPP</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f1eaff;border:1px solid #c4a0f0"></div> Kattar NEET</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fef3e0;border:1px solid #f5c842"></div> PYQ NEET</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fdeaea;border:1px solid #f0a0a0"></div> PYQ JEE</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#e0f5f5;border:1px solid #80d0d0"></div> NCERT</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#fff0e0;border:1px solid #ffb060"></div> Revision</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#d4edda;border:1px solid #4caf72"></div> Chapter Complete ✅</div>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   CHAPTER DATA  ← EDIT HERE TO CHANGE LECTURE COUNTS
+   lec = number of lectures (DPP count auto-matches)
+══════════════════════════════════════════════════════════════ */
+const CHAPTERS = [
+  { name: "IUPAC Nomenclature",               lec: 12 },
+  { name: "Isomerism",                         lec: 12 },
+  { name: "GOC (General Organic Chemistry)",   lec: 13 },
+  { name: "Hydrocarbons",                      lec: 12 },
+  { name: "Haloalkane and Haloarene",          lec: 11 },
+  { name: "Alcohol, Phenol and Ether",         lec: 12 },
+  { name: "Carboxylic Acid and Ester",         lec: 11 },
+  { name: "Amine",                             lec: 10 },
+  { name: "Biomolecules",                      lec: 12 },
+  { name: "Purification Techniques",           lec: 10 },
+];
+/* ══════════════════════════════════════════════════════════════ */
+
+// Revision schedule: days after chapter completion
+const REV_DAYS = [1, 3, 5, 8, 15, 30, 50];
+const STORE_KEY = "neet_chem_organic";
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
+}
+function save(data) { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+
+function gk(ci, type, idx) { return `ch${ci}_${type}_${idx}`; }
+function noteKey(ci) { return `ch${ci}_note`; }
+function compKey(ci) { return `ch${ci}_completedDate`; }
+function revKey(ci, day) { return `ch${ci}_rev_d${day}`; }
+
+// Check if dropdown-1 is fully done (lec + dpp + kneet + pyqneet + pyqjee)
+function isDropdown1Complete(ci, data) {
+  const ch = CHAPTERS[ci];
+  for (let i = 0; i < ch.lec; i++) {
+    if (!data[gk(ci,"lec",i)]) return false;
+    if (!data[gk(ci,"dpp",i)]) return false;
+  }
+  if (!data[gk(ci,"kneet",0)]) return false;
+  if (!data[gk(ci,"kneet",1)]) return false;
+  if (!data[gk(ci,"pyqneet",0)]) return false;
+  if (!data[gk(ci,"pyqjee",0)]) return false;
+  return true;
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
+function today() { return new Date().toISOString().slice(0, 10); }
+
+/* ── RENDER ── */
+function render() {
+  const data = load();
+  const main = document.getElementById("main");
+  main.innerHTML = "";
+  let totalBoxes = 0, doneBoxes = 0;
+
+  CHAPTERS.forEach((ch, ci) => {
+    const lc = ch.lec;
+    const completed1 = isDropdown1Complete(ci, data);
+    let compDate = data[compKey(ci)];
+    if (completed1 && !compDate) {
+      data[compKey(ci)] = today();
+      compDate = data[compKey(ci)];
+      save(data);
+    }
+
+    // Count progress (dropdown1 boxes only for "complete" detection, all for overall)
+    let chTotal = lc + lc + 2 + 2; // lec + dpp + kneet + pyq
+    let chDone = 0;
+    for (let i = 0; i < lc; i++) { if (data[gk(ci,"lec",i)]) chDone++; }
+    for (let i = 0; i < lc; i++) { if (data[gk(ci,"dpp",i)]) chDone++; }
+    if (data[gk(ci,"kneet",0)]) chDone++;
+    if (data[gk(ci,"kneet",1)]) chDone++;
+    if (data[gk(ci,"pyqneet",0)]) chDone++;
+    if (data[gk(ci,"pyqjee",0)]) chDone++;
+    // ncert + revisions
+    chTotal += 1;
+    if (data[gk(ci,"ncert",0)]) chDone++;
+    chTotal += REV_DAYS.length;
+    REV_DAYS.forEach(d => { if (data[revKey(ci, d)]) chDone++; });
+
+    totalBoxes += chTotal;
+    doneBoxes += chDone;
+
+    const pct = chTotal ? Math.round(chDone / chTotal * 100) : 0;
+    const lecDone  = Array.from({length:lc}, (_,i) => data[gk(ci,"lec",i)]).filter(Boolean).length;
+    const dppDone  = Array.from({length:lc}, (_,i) => data[gk(ci,"dpp",i)]).filter(Boolean).length;
+    const knDone   = [0,1].filter(i => data[gk(ci,"kneet",i)]).length;
+    const pyqND    = data[gk(ci,"pyqneet",0)] ? 1 : 0;
+    const pyqJD    = data[gk(ci,"pyqjee",0)]  ? 1 : 0;
+
+    /* ── REVISION BOXES ── */
+    const revBoxesHTML = REV_DAYS.map(day => {
+      const targetDate = compDate ? addDays(compDate, day) : null;
+      const done = data[revKey(ci, day)];
+      const locked = !compDate;
+      return `<div class="rev-item">
+        <div class="rev-box ${done ? "done-rev" : ""} ${locked ? "rev-locked-box" : ""}"
+          onclick="${locked ? "" : `toggleRev(${ci},${day})`}"
+          title="Day ${day} revision${targetDate ? " — " + formatDate(targetDate) : ""}">
+          <svg class="tick" width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8l3.5 3.5L13 5" stroke="#8a3a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          ${!done && !locked ? `<span class="rev-day-label">D${day}</span><span class="rev-date-label">${formatDate(targetDate)}</span>` : ""}
+          ${done ? `<span class="rev-day-label">D${day}</span>` : ""}
+          ${locked ? `<span style="font-size:9px;color:#aaa">D${day}</span>` : ""}
+        </div>
+        <span class="rev-item-label">Day ${day}</span>
+      </div>`;
+    }).join("");
+
+    const card = document.createElement("div");
+    card.className = `chapter-card${completed1 ? " completed" : ""}`;
+    card.id = `card-${ci}`;
+    card.innerHTML = `
+      <div class="ch-progress"><div class="ch-progress-fill" id="cpbar-${ci}" style="width:${pct}%"></div></div>
+
+      <!-- ── DROPDOWN 1 HEADER ── -->
+      <div class="chapter-head" onclick="toggleBody(${ci})">
+        <div class="ch-num">${ci + 1}</div>
+        <div class="ch-name">${ch.name}</div>
+        <span class="ch-complete-badge">✅ Complete</span>
+        <div class="ch-mini-stats">
+          <span class="mini-pill pill-lec" id="pill-lec-${ci}">Lec ${lecDone}/${lc}</span>
+          <span class="mini-pill pill-dpp" id="pill-dpp-${ci}">DPP ${dppDone}/${lc}</span>
+          <span class="mini-pill pill-kneet" id="pill-kn-${ci}">KN ${knDone}/2</span>
+          <span class="mini-pill pill-pyq" id="pill-pyq-${ci}">N ${pyqND} · J ${pyqJD}</span>
+        </div>
+        <span class="chevron" id="chev-${ci}">▼</span>
+      </div>
+
+      <!-- ── DROPDOWN 1 BODY ── -->
+      <div class="chapter-body" id="cbody-${ci}">
+
+        <!-- LECTURES -->
+        <div class="section-block">
+          <div class="section-label">📖 Lectures <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--hint)">(${lc} total)</span></div>
+          <div class="check-grid">
+            ${Array.from({length:lc}, (_,i) => {
+              const done = data[gk(ci,"lec",i)];
+              return `<div class="check-item">
+                <div class="check-box ${done?"done-lec":""}" id="chk-lec-${ci}-${i}" onclick="toggle(${ci},'lec',${i})" title="Lecture ${i+1}">
+                  <svg class="tick" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#1a5fa8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <span class="check-label">L${i+1}</span>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+
+        <!-- DPP -->
+        <div class="section-block">
+          <div class="section-label">📝 DPP <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--hint)">(${lc} total)</span></div>
+          <div class="check-grid">
+            ${Array.from({length:lc}, (_,i) => {
+              const done = data[gk(ci,"dpp",i)];
+              return `<div class="check-item">
+                <div class="check-box ${done?"done-dpp":""}" id="chk-dpp-${ci}-${i}" onclick="toggle(${ci},'dpp',${i})" title="DPP ${i+1}">
+                  <svg class="tick" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#2a7a3b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <span class="check-label">D${i+1}</span>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+
+        <!-- KATTAR NEET -->
+        <div class="section-block">
+          <div class="section-label">🎯 Kattar NEET <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--hint)">(2 rounds)</span></div>
+          <div class="check-grid">
+            ${[0,1].map(i => {
+              const done = data[gk(ci,"kneet",i)];
+              return `<div class="check-item">
+                <div class="check-box ${done?"done-kneet":""}" id="chk-kneet-${ci}-${i}" onclick="toggle(${ci},'kneet',${i})" title="Kattar NEET Round ${i+1}">
+                  <svg class="tick" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#5b2d8e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <span class="check-label">KN ${i+1}</span>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+
+        <!-- PYQ -->
+        <div class="section-block">
+          <div class="section-label">📅 Previous Year Questions</div>
+          <div class="pyq-row">
+            <div class="pyq-col">
+              <div class="pyq-col-label" style="color:var(--amber)">NEET PYQ</div>
+              <div class="check-box ${data[gk(ci,"pyqneet",0)]?"done-pyq-neet":""}" id="chk-pyqneet-${ci}"
+                onclick="toggle(${ci},'pyqneet',0)" style="width:56px;border-radius:8px" title="NEET PYQ">
+                <svg class="tick" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#7a4f00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="pyq-col">
+              <div class="pyq-col-label" style="color:var(--red)">JEE PYQ</div>
+              <div class="check-box ${data[gk(ci,"pyqjee",0)]?"done-pyq-jee":""}" id="chk-pyqjee-${ci}"
+                onclick="toggle(${ci},'pyqjee',0)" style="width:56px;border-radius:8px" title="JEE PYQ">
+                <svg class="tick" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#a02020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── DROPDOWN 2 HEADER (Study Planner) ── -->
+        <div class="planner-head" onclick="togglePlanner(${ci})">
+          <span style="font-size:15px">📋</span>
+          <span class="planner-label">Study Planner — NCERT & Revision</span>
+          <span class="planner-sub" id="planner-sub-${ci}">${compDate ? "Started "+formatDate(compDate) : "Unlocks when Chapter 1 is complete"}</span>
+          <span class="chevron" id="pchev-${ci}">▼</span>
+        </div>
+
+        <!-- ── DROPDOWN 2 BODY ── -->
+        <div class="planner-body" id="pbody-${ci}">
+
+          <!-- NCERT -->
+          <div class="section-block">
+            <div class="section-label">📗 NCERT Reading</div>
+            <div class="ncert-row">
+              <div class="ncert-box ${data[gk(ci,"ncert",0)]?"done-ncert":""}" id="chk-ncert-${ci}"
+                onclick="toggle(${ci},'ncert',0)" title="NCERT Read">
+                <svg class="tick" width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#0f6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="ncert-desc">Mark when you've read the NCERT chapter completely</div>
+            </div>
+          </div>
+
+          <!-- REVISION PLANNER -->
+          <div class="section-block">
+            <div class="section-label">🔁 Revision Planner
+              <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--hint)">
+                — Day 1, 3, 5, 8, 15, 30, 50 after completion
+              </span>
+            </div>
+            ${!compDate
+              ? `<div class="rev-locked">🔒 Complete all items in dropdown 1 to unlock revision schedule</div>`
+              : `<div class="rev-date-display">Chapter completed on <strong>${formatDate(compDate)}</strong></div>`
+            }
+            <div class="rev-grid" style="margin-top:10px" id="rev-grid-${ci}">
+              ${revBoxesHTML}
+            </div>
+          </div>
+
+        </div><!-- end planner-body -->
+      </div><!-- end chapter-body -->
+    `;
+    main.appendChild(card);
+  });
+
+  const overallPct = totalBoxes ? Math.round(doneBoxes / totalBoxes * 100) : 0;
+  document.getElementById("overall-bar").style.width = overallPct + "%";
+  document.getElementById("overall-pct").textContent = overallPct + "%";
+}
+
+/* ── TOGGLE CHECKBOX ── */
+function toggle(ci, type, idx) {
+  const data = load();
+  const key = gk(ci, type, idx);
+  data[key] = !data[key];
+
+  // if dropdown1 just became complete, stamp date
+  if (isDropdown1Complete(ci, data) && !data[compKey(ci)]) {
+    data[compKey(ci)] = today();
+  }
+  save(data);
+  updateCard(ci, data);
+  updateOverall(data);
+}
+
+function toggleRev(ci, day) {
+  const data = load();
+  const key = revKey(ci, day);
+  data[key] = !data[key];
+  save(data);
+  updateCard(ci, data);
+  updateOverall(data);
+}
+
+/* ── UPDATE SINGLE CARD ── */
+function updateCard(ci, data) {
+  const ch = CHAPTERS[ci];
+  const lc = ch.lec;
+  const completed1 = isDropdown1Complete(ci, data);
+  const compDate = data[compKey(ci)];
+
+  // update checkbox visuals
+  const typeMap = [
+    ...Array.from({length:lc}, (_,i) => ({type:"lec",i,cls:"done-lec",el:`chk-lec-${ci}-${i}`})),
+    ...Array.from({length:lc}, (_,i) => ({type:"dpp",i,cls:"done-dpp",el:`chk-dpp-${ci}-${i}`})),
+    {type:"kneet",i:0,cls:"done-kneet",el:`chk-kneet-${ci}-0`},
+    {type:"kneet",i:1,cls:"done-kneet",el:`chk-kneet-${ci}-1`},
+    {type:"pyqneet",i:0,cls:"done-pyq-neet",el:`chk-pyqneet-${ci}`},
+    {type:"pyqjee",i:0,cls:"done-pyq-jee",el:`chk-pyqjee-${ci}`},
+    {type:"ncert",i:0,cls:"done-ncert",el:`chk-ncert-${ci}`},
+  ];
+  typeMap.forEach(({type,i,cls,el}) => {
+    const box = document.getElementById(el);
+    if (box) { data[gk(ci,type,i)] ? box.classList.add(cls) : box.classList.remove(cls); }
+  });
+
+  // card green
+  const card = document.getElementById(`card-${ci}`);
+  if (card) { completed1 ? card.classList.add("completed") : card.classList.remove("completed"); }
+
+  // pills
+  const lecDone = Array.from({length:lc}, (_,i) => data[gk(ci,"lec",i)]).filter(Boolean).length;
+  const dppDone = Array.from({length:lc}, (_,i) => data[gk(ci,"dpp",i)]).filter(Boolean).length;
+  const knDone  = [0,1].filter(i => data[gk(ci,"kneet",i)]).length;
+  const pyqND   = data[gk(ci,"pyqneet",0)] ? 1 : 0;
+  const pyqJD   = data[gk(ci,"pyqjee",0)]  ? 1 : 0;
+  const p = (id, t) => { const el = document.getElementById(id); if(el) el.textContent = t; };
+  p(`pill-lec-${ci}`, `Lec ${lecDone}/${lc}`);
+  p(`pill-dpp-${ci}`, `DPP ${dppDone}/${lc}`);
+  p(`pill-kn-${ci}`,  `KN ${knDone}/2`);
+  p(`pill-pyq-${ci}`, `N ${pyqND} · J ${pyqJD}`);
+
+  // planner sub-label
+  const sub = document.getElementById(`planner-sub-${ci}`);
+  if (sub) sub.textContent = compDate ? "Started " + formatDate(compDate) : "Unlocks when Chapter 1 is complete";
+
+  // rebuild revision grid
+  const revGrid = document.getElementById(`rev-grid-${ci}`);
+  if (revGrid) {
+    revGrid.innerHTML = REV_DAYS.map(day => {
+      const targetDate = compDate ? addDays(compDate, day) : null;
+      const done = data[revKey(ci, day)];
+      const locked = !compDate;
+      return `<div class="rev-item">
+        <div class="rev-box ${done?"done-rev":""} ${locked?"rev-locked-box":""}"
+          onclick="${locked?"":"toggleRev("+ci+","+day+")"}"
+          title="Day ${day} revision${targetDate?" — "+formatDate(targetDate):""}">
+          <svg class="tick" width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8l3.5 3.5L13 5" stroke="#8a3a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          ${!done && !locked ? `<span class="rev-day-label">D${day}</span><span class="rev-date-label">${formatDate(targetDate)}</span>` : ""}
+          ${done ? `<span class="rev-day-label">D${day}</span>` : ""}
+          ${locked ? `<span style="font-size:9px;color:#aaa">D${day}</span>` : ""}
+        </div>
+        <span class="rev-item-label">Day ${day}</span>
+      </div>`;
+    }).join("");
+  }
+
+  // progress bar
+  let chTotal = lc + lc + 2 + 2 + 1 + REV_DAYS.length;
+  let chDone = lecDone + dppDone + knDone + pyqND + pyqJD;
+  if (data[gk(ci,"ncert",0)]) chDone++;
+  REV_DAYS.forEach(d => { if (data[revKey(ci,d)]) chDone++; });
+  const pct = chTotal ? Math.round(chDone / chTotal * 100) : 0;
+  const bar = document.getElementById(`cpbar-${ci}`);
+  if (bar) bar.style.width = pct + "%";
+}
+
+function updateOverall(data) {
+  let totalBoxes = 0, doneBoxes = 0;
+  CHAPTERS.forEach((ch, ci) => {
+    const lc = ch.lec;
+    let chTotal = lc + lc + 2 + 2 + 1 + REV_DAYS.length;
+    let chDone = 0;
+    for (let i = 0; i < lc; i++) { if (data[gk(ci,"lec",i)]) chDone++; }
+    for (let i = 0; i < lc; i++) { if (data[gk(ci,"dpp",i)]) chDone++; }
+    if (data[gk(ci,"kneet",0)]) chDone++;
+    if (data[gk(ci,"kneet",1)]) chDone++;
+    if (data[gk(ci,"pyqneet",0)]) chDone++;
+    if (data[gk(ci,"pyqjee",0)]) chDone++;
+    if (data[gk(ci,"ncert",0)]) chDone++;
+    REV_DAYS.forEach(d => { if (data[revKey(ci,d)]) chDone++; });
+    totalBoxes += chTotal; doneBoxes += chDone;
+  });
+  const pct = totalBoxes ? Math.round(doneBoxes / totalBoxes * 100) : 0;
+  document.getElementById("overall-bar").style.width = pct + "%";
+  document.getElementById("overall-pct").textContent = pct + "%";
+}
+
+function toggleBody(ci) {
+  document.getElementById("cbody-"+ci).classList.toggle("open");
+  document.getElementById("chev-"+ci).classList.toggle("open");
+}
+function togglePlanner(ci) {
+  document.getElementById("pbody-"+ci).classList.toggle("open");
+  document.getElementById("pchev-"+ci).classList.toggle("open");
+}
+
+function confirmReset() {
+  if (confirm("Reset ALL progress for Organic Chemistry? This cannot be undone.")) {
+    localStorage.removeItem(STORE_KEY); render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>

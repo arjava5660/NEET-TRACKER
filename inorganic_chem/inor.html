@@ -41,6 +41,37 @@
     --radius: 10px;
     --radius-sm: 6px;
   }
+  .dark-mode {
+    --bg: #12131f;
+    --card: #1b1f33;
+    --border: #2e3352;
+    --border2: #3b4261;
+    --text: #e6ecff;
+    --muted: #9aa5d0;
+    --hint: #7f8db7;
+    --blue: #8fb6ff;
+    --blue-bg: #2a325a;
+    --blue-border: #4861a4;
+    --green: #7be7b9;
+    --green-bg: #1c2d2b;
+    --green-border: #3a6f63;
+    --green-dark: #baf2c0;
+    --amber: #ffd38c;
+    --amber-bg: #3a3025;
+    --amber-border: #7b5d30;
+    --purple: #b288ff;
+    --purple-bg: #2c2547;
+    --purple-border: #5f4ba6;
+    --red: #ff8c8c;
+    --red-bg: #3b2426;
+    --red-border: #8a3f46;
+    --teal: #6ce2d1;
+    --teal-bg: #1f3230;
+    --teal-border: #3f7d7b;
+    --orange: #ffbb7e;
+    --orange-bg: #3a2c1f;
+    --orange-border: #7d5f33;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
@@ -53,7 +84,8 @@
   .topbar-icon { width: 36px; height: 36px; background: var(--green-bg); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; }
   .topbar-title { font-size: 17px; font-weight: 600; }
   .topbar-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
-  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .back-btn { padding: 8px 12px; background: var(--blue-bg); border: 1px solid var(--blue-border); color: var(--blue); border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; font-weight: 600; }
   .overall-bar-wrap { width: 160px; }
   .overall-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
   .bar-track { height: 6px; background: var(--border); border-radius: 3px; }
@@ -181,6 +213,7 @@
     <div class="topbar-sub">6 Chapters</div>
   </div>
   <div class="topbar-right">
+    <button class="back-btn" onclick="goBack()">← BACK</button>
     <div class="overall-bar-wrap">
       <div class="overall-label"><span>Overall</span><span id="overall-pct">0%</span></div>
       <div class="bar-track"><div class="bar-fill" id="overall-bar" style="width:0%"></div></div>
@@ -596,6 +629,33 @@ function confirmReset() {
 }
 
 render();
+
+function goBack() {
+  window.location.href = '../parent.html';
+}
+
+function loadDarkMode() {
+  return localStorage.getItem('neet_dark_mode') === 'true';
+}
+
+function saveDarkMode(value) {
+  localStorage.setItem('neet_dark_mode', value ? 'true' : 'false');
+}
+
+function applyDarkMode() {
+  const enabled = loadDarkMode();
+  document.body.classList.toggle('dark-mode', enabled);
+  const btn = document.querySelector('.reset-btn[onclick="toggleDarkMode()"]');
+  if (btn) btn.textContent = enabled ? '☀️ Light' : '🌙';
+}
+
+function toggleDarkMode() {
+  const enabled = !loadDarkMode();
+  saveDarkMode(enabled);
+  applyDarkMode();
+}
+
+applyDarkMode();
 </script>
 </body>
 </html>

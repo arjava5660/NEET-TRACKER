@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Past Planner — NEET Tracker</title>
+<style>
+:root {
+  --bg: #f7f6f2;
+  --card: #fff;
+  --border: #e2e0d8;
+  --text: #1a1a18;
+  --muted: #6b6960;
+  --hint: #9e9b91;
+  --blue: #1a5fa8;
+  --green: #2a7a3b;
+  --amber: #7a4f00;
+  --red: #a02020;
+  --purple: #5b2d8e;
+  --teal: #0f6b6b;
+  --orange: #8a3a00;
+  --radius: 10px;
+}
+.dark-mode {
+  --bg: #12131f;
+  --card: #1b1f33;
+  --border: #2e3352;
+  --text: #e6ecff;
+  --muted: #9aa5d0;
+  --hint: #7f8db7;
+  --blue: #8fb6ff;
+  --green: #7be7b9;
+  --amber: #ffd38c;
+  --red: #ff8c8c;
+  --purple: #b288ff;
+  --teal: #6ce2d1;
+  --orange: #ffbb7e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+.header { background: var(--card); border-bottom: 1px solid var(--border); padding: 20px 24px; position: sticky; top: 0; z-index: 100; }
+.header-top { display: flex; align-items: center; gap: 16px; }
+.logo { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; background: linear-gradient(135deg, var(--green), var(--blue)); color: #fff; }
+.title { font-size: 22px; font-weight: 700; }
+.subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.header-right { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.header-btn { font-size: 12px; padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); cursor: pointer; font-weight: 500; transition: all 0.15s; }
+.header-btn:hover { background: var(--card); border-color: var(--blue); color: var(--blue); }
+.dark-mode .header-btn { background: #fff; color: #12131f; border-color: rgba(255,255,255,0.18); }
+.dark-mode .header-btn:hover { background: #f2f2f2; color: #1a5fa8; }
+.main { padding: 20px 24px; max-width: 1000px; margin: 0 auto; }
+.section { margin-bottom: 24px; }
+.section-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; color: var(--text); }
+.planner-list { display: flex; flex-direction: column; gap: 18px; }
+.date-group { display: flex; flex-direction: column; gap: 10px; }
+.date-heading { font-size: 13px; font-weight: 700; color: var(--blue); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.planner-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+.planner-item-text { font-size: 12px; font-weight: 700; color: var(--text); }
+.empty-state { text-align: center; padding: 24px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-top">
+    <div class="logo">🗂️</div>
+    <div>
+      <div class="title">Past Planner</div>
+      <div class="subtitle">View completed planner items from the dashboard</div>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" onclick="window.location.href='parent.html'">◀ Back</button>
+      <button class="header-btn" onclick="toggleDarkMode()">🌙 Dark</button>
+    </div>
+  </div>
+</div>
+<div class="main">
+  <div class="section">
+    <div class="section-title">Completed Planner Items</div>
+    <div class="planner-list" id="planner-list"></div>
+  </div>
+</div>
+<script>
+const PLANNER_KEY = 'neet_planner';
+const DARK_MODE_KEY = 'neet_dark_mode';
+const TODAY = new Date().toISOString().slice(0, 10);
+
+function loadPlanner() {
+  try { return JSON.parse(localStorage.getItem(PLANNER_KEY)) || []; } catch { return []; }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return 'Unknown date';
+  if (dateStr === 'today' || dateStr === TODAY) return 'Today';
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function renderPlanner() {
+  const list = document.getElementById('planner-list');
+  const items = loadPlanner().filter(item => item.done);
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state">No past planner items found. Mark planner items as done in the dashboard to see them here.</div>';
+    return;
+  }
+  const grouped = items.reduce((acc, item) => {
+    const dateKey = item.date || TODAY;
+    if (!acc[dateKey]) acc[dateKey] = [];
+    acc[dateKey].push(item);
+    return acc;
+  }, {});
+
+  const dates = Object.keys(grouped).sort((a, b) => {
+    if (a === TODAY) return -1;
+    if (b === TODAY) return 1;
+    return new Date(b) - new Date(a);
+  });
+
+  list.innerHTML = dates.map(dateKey => `
+    <div class="date-group">
+      <div class="date-heading">${formatDate(dateKey)}</div>
+      ${grouped[dateKey].map(item => `
+        <div class="planner-item">
+          <div class="planner-item-text">${item.text}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function loadDarkMode() {
+  return localStorage.getItem(DARK_MODE_KEY) === 'true';
+}
+
+function saveDarkMode(value) {
+  localStorage.setItem(DARK_MODE_KEY, value ? 'true' : 'false');
+}
+
+function applyDarkMode() {
+  const enabled = loadDarkMode();
+  document.body.classList.toggle('dark-mode', enabled);
+  const btn = document.querySelector('.header-btn[onclick="toggleDarkMode()"]');
+  if (btn) btn.textContent = enabled ? '☀️ Light' : '🌙 Dark';
+}
+
+function toggleDarkMode() {
+  const enabled = !loadDarkMode();
+  saveDarkMode(enabled);
+  applyDarkMode();
+}
+
+applyDarkMode();
+renderPlanner();
+</script>
+</body>
+</html>

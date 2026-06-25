@@ -21,6 +21,21 @@
   --orange: #8a3a00;
   --radius: 10px;
 }
+.dark-mode {
+  --bg: #12131f;
+  --card: #1b1f33;
+  --border: #2e3352;
+  --text: #e6ecff;
+  --muted: #9aa5d0;
+  --hint: #7f8db7;
+  --blue: #8fb6ff;
+  --green: #7be7b9;
+  --amber: #ffd38c;
+  --red: #ff8c8c;
+  --purple: #b288ff;
+  --teal: #6ce2d1;
+  --orange: #ffbb7e;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
 
@@ -52,6 +67,10 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .header-btn:hover { background: var(--card); border-color: var(--blue); color: var(--blue); }
 .header-btn.danger { color: var(--red); border-color: #f0a0a0; }
 .header-btn.danger:hover { background: #fdeaea; border-color: var(--red); }
+.dark-mode .header-btn { background: #fff; color: #12131f; border-color: rgba(255,255,255,0.18); }
+.dark-mode .header-btn:hover { background: #f2f2f2; color: #1a5fa8; }
+.dark-mode .header-btn.danger { color: #ff8c8c; border-color: rgba(255,140,140,0.45); }
+.dark-mode .header-btn.danger:hover { background: #4c2c2c; }
 
 .main { padding: 20px 24px; max-width: 1200px; margin: 0 auto; }
 .section { margin-bottom: 28px; }
@@ -114,7 +133,55 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .modal-btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
 .modal-btn.primary:hover { background: #164d8f; }
 
-input[type="file"] { display: none; }
+  .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .analytics-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .analytics-card strong { display: block; font-size: 26px; color: var(--text); }
+  .analytics-card small { color: var(--muted); font-size: 13px; }
+  .analytics-card .analytics-note { color: var(--blue); font-size: 12px; }
+
+  .weak-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 20px; }
+  .weak-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; position: relative; }
+  .weak-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .weak-item { padding: 6px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  .weak-item:last-child { border-bottom: none; }
+  .weak-item-title { font-size: 12px; font-weight: 600; }
+  .weak-item-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .weak-item-delete { border: none; background: transparent; color: var(--red); cursor: pointer; font-size: 13px; }
+  .weak-control-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .weak-control-input, .weak-control-select { flex: 1 1 180px; min-width: 160px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
+  .weak-control-button { border: none; border-radius: 8px; background: var(--blue); color: white; padding: 10px 16px; cursor: pointer; font-size: 13px; transition: background 0.15s; }
+  .weak-control-button:hover { background: #164d8f; }
+  .weak-clear-button { border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); padding: 10px 16px; cursor: pointer; font-size: 13px; transition: background 0.15s; }
+  .weak-clear-button:hover { background: var(--card); }
+
+  .planner-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 24px; }
+  .planner-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .planner-title { font-size: 16px; font-weight: 700; }
+  .planner-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .planner-input-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .planner-input { flex: 1; min-width: 180px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
+  .planner-add { padding: 10px 16px; border-radius: 8px; border: none; background: var(--blue); color: #fff; font-size: 13px; cursor: pointer; }
+  .planner-add:hover { background: #164d8f; }
+  .planner-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .planner-button { border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); padding: 8px 12px; cursor: pointer; font-size: 12px; transition: all 0.15s; }
+  .planner-button:hover { background: var(--card); border-color: var(--blue); color: var(--blue); }
+  .planner-list { display: flex; flex-direction: column; gap: 8px; }
+  .planner-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+  .planner-item:hover { background: #f0f0ec; }
+  .planner-item.done { background: #e6f4ea; border-color: var(--green); }
+  .planner-item-text { font-size: 14px; color: var(--text); flex: 1; }
+  .planner-item-actions { display: flex; gap: 8px; align-items: center; }
+  .planner-item-toggle, .planner-item-delete { border: none; background: transparent; cursor: pointer; font-size: 16px; color: var(--muted); }
+  .planner-item-toggle.done { color: var(--green); }
+  .planner-item-text.done { text-decoration: line-through; opacity: 0.6; }
+  .planner-item-date { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .planner-completed-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-top: 12px; }
+  .planner-completed-panel h4 { margin: 0 0 10px; font-size: 14px; font-weight: 700; }
+  .planner-completed-item { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .planner-completed-item:last-child { border-bottom: none; }
+  .planner-completed-item-text { font-size: 13px; color: var(--text); }
+  .planner-completed-item-date { font-size: 12px; color: var(--muted); }
+}
 </style>
 </head>
 <body>
@@ -131,19 +198,80 @@ input[type="file"] { display: none; }
      <div class="countdown-value" id="neet-countdown">Loading…</div>
     </div>
     <div class="header-right">
+      <button class="header-btn" onclick="toggleDarkMode()">🌙 Dark</button>
       <button class="header-btn" onclick="openSettings()">⚙️ Settings</button>
       <button class="header-btn" onclick="backupData()">💾 Backup</button>
-      <label for="restore-file" class="header-btn" style="margin:0;cursor:pointer">📂 Restore</label>
-      <input type="file" id="restore-file" accept=".json" onchange="restoreData(event)">
       <button class="header-btn danger" onclick="resetAll()">🗑️ Reset All</button>
     </div>
   </div>
 </div>
 
 <div class="main">
+  <div class="analytics-grid">
+    <div class="analytics-card">
+      <div class="analytics-label">Overall Progress</div>
+      <strong id="analytics-progress">0%</strong>
+      <small id="analytics-progress-meta">Average progress across all subjects</small>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-label">Chapters Completed</div>
+      <strong id="analytics-chapters">0 / 0</strong>
+      <small id="analytics-chapters-meta">Fully completed subjects and chapters</small>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-label">Pending Revisions</div>
+      <strong id="analytics-revisions">0 today</strong>
+      <small id="analytics-revisions-meta">Revisions due or due soon</small>
+    </div>
+    </div>
+
   <div class="section">
     <div class="section-title">📚 All Subjects</div>
     <div class="subject-grid" id="subject-grid"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">�️ Daily Planner</div>
+    <div class="planner-panel">
+      <div class="planner-head">
+        <div>
+          <div class="planner-title">Plan your study session</div>
+          <div class="planner-desc">Type a note or add quick builds like lectures, DPP, and questions.</div>
+        </div>
+      </div>
+      <div class="planner-input-row">
+        <input type="text" class="planner-input" id="planner-input" placeholder="Write a planner note, e.g. '3 lec + 10 ques'" onkeypress="if(event.key==='Enter') addPlannerItem()">
+        <button class="planner-add" onclick="addPlannerItem()">Add</button>
+      </div>
+      <div class="planner-buttons">
+        <button class="planner-button" onclick="addPlannerTemplate('3 lec')">3 LEC</button>
+        <button class="planner-button" onclick="addPlannerTemplate('2 lec')">2 LEC</button>
+        <button class="planner-button" onclick="addPlannerTemplate('DPP of that lec')">DPP OF THAT LEC</button>
+        <button class="planner-button" onclick="promptPlannerQuestions()">QUESTIONS...</button>
+        <button class="planner-button" onclick="window.location.href='past_planner.html'">OPEN PAST PLANNER</button>
+      </div>
+      <div class="planner-list" id="planner-list"></div>
+      <div class="planner-completed-panel" id="planner-completed-panel" hidden></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🔥 Weak Topics</div>
+    <div class="weak-control-row">
+      <input type="text" id="weak-input" class="weak-control-input" placeholder="Add weak topic name" />
+      <select id="weak-subject" class="weak-control-select">
+        <option value="">Choose subject (optional)</option>
+        <option value="Physics">Physics</option>
+        <option value="Organic Chemistry">Organic Chemistry</option>
+        <option value="Physical Chemistry">Physical Chemistry</option>
+        <option value="Inorganic Chemistry">Inorganic Chemistry</option>
+        <option value="Botany">Botany</option>
+        <option value="Zoology">Zoology</option>
+      </select>
+      <button class="weak-control-button" onclick="addWeakTopic()">Add Weak Topic</button>
+      <button class="weak-clear-button" onclick="clearWeakTopics()">Clear All</button>
+    </div>
+    <div class="weak-grid" id="weak-grid"></div>
   </div>
 
   <div class="section">
@@ -281,6 +409,9 @@ const CHAPTER_DEFS = {
 
 const TODAY = new Date().toISOString().slice(0, 10);
 const TASKS_KEY = 'neet_tasks';
+const PLANNER_KEY = 'neet_planner';
+const WEAK_TOPICS_KEY = 'neet_weak_topics';
+const DARK_MODE_KEY = 'neet_dark_mode';
 const REV_DAYS = [1, 3, 5, 8, 15, 30, 50];
 
 function addDays(dateStr, days) {
@@ -367,6 +498,8 @@ function toggleRevision(subjectKey, chIndex, day) {
   localStorage.setItem(subjectKey, JSON.stringify(data));
   renderRevisions();
   renderSubjects();
+  renderAnalytics();
+  renderWeakTopics();
 }
 
 function renderRevisions() {
@@ -390,6 +523,280 @@ function renderRevisions() {
   `).join('');
 }
 
+function getChapterCompletion(subjectKey, chIndex, data) {
+  const lec = getChapterLecCount(subjectKey, chIndex);
+  let total = 0;
+  let done = 0;
+
+  for (let i = 0; i < lec; i++) {
+    total += 2;
+    if (data[`ch${chIndex}_lec_${i}`]) done++;
+    if (data[`ch${chIndex}_dpp_${i}`]) done++;
+  }
+
+  total += 4;
+  if (data[`ch${chIndex}_kneet_0`]) done++;
+  if (data[`ch${chIndex}_kneet_1`]) done++;
+  if (data[`ch${chIndex}_pyqneet_0`]) done++;
+  if (data[`ch${chIndex}_pyqjee_0`]) done++;
+
+  total += 1;
+  if (data[`ch${chIndex}_ncert_0`]) done++;
+
+  total += REV_DAYS.length;
+  REV_DAYS.forEach(day => { if (data[`ch${chIndex}_rev_d${day}`]) done++; });
+
+  const percent = total ? Math.round(done / total * 100) : 0;
+  return { total, done, percent, lec, lecDone: Array.from({ length: lec }, (_, i) => data[`ch${chIndex}_lec_${i}`]).filter(Boolean).length, dppDone: Array.from({ length: lec }, (_, i) => data[`ch${chIndex}_dpp_${i}`]).filter(Boolean).length, knDone: [0, 1].filter(i => data[`ch${chIndex}_kneet_${i}`]).length, pyqNeeDone: data[`ch${chIndex}_pyqneet_0`] ? 1 : 0, pyqJeeDone: data[`ch${chIndex}_pyqjee_0`] ? 1 : 0, ncertDone: data[`ch${chIndex}_ncert_0`] ? 1 : 0 };
+}
+
+function getUpcomingRevisions() {
+  const items = [];
+  SUBJECTS.forEach(s => {
+    const data = getSubjectData(s.key);
+    const chapters = CHAPTER_DEFS[s.key] || [];
+    chapters.forEach((ch, ci) => {
+      const compDate = data[`ch${ci}_completedDate`];
+      if (!compDate) return;
+      REV_DAYS.forEach(day => {
+        const targetDate = addDays(compDate, day);
+        if (targetDate >= TODAY && targetDate <= addDays(TODAY, 7) && !data[`ch${ci}_rev_d${day}`]) {
+          items.push({ subject: s.name, chapter: ch, day, targetDate });
+        }
+      });
+    });
+  });
+  return items;
+}
+
+function getDashboardStats() {
+  let totalSubjects = SUBJECTS.length;
+  let totalChapters = 0;
+  let completedChapters = 0;
+  let progressSum = 0;
+  const weak = [];
+
+  SUBJECTS.forEach(s => {
+    const chapters = CHAPTER_DEFS[s.key] || [];
+    const data = getSubjectData(s.key);
+    chapters.forEach((ch, ci) => {
+      const stats = getChapterCompletion(s.key, ci, data);
+      totalChapters += 1;
+      if (stats.percent === 100) completedChapters += 1;
+      if (stats.percent < 100) {
+        const missing = [];
+        if (stats.lecDone < stats.lec) missing.push(`${stats.lec - stats.lecDone} lec`);
+        if (stats.dppDone < stats.lec) missing.push(`${stats.lec - stats.dppDone} DPP`);
+        if (stats.knDone < 2) missing.push(`${2 - stats.knDone} KN`);
+        if (!stats.pyqNeeDone) missing.push('NEET PYQ');
+        if (!stats.pyqJeeDone) missing.push('JEE PYQ');
+        if (!stats.ncertDone) missing.push('NCERT');
+        const pendingRevs = REV_DAYS.filter(day => !data[`ch${ci}_rev_d${day}`] && data[`ch${ci}_completedDate`]).length;
+        if (pendingRevs) missing.push(`${pendingRevs} rev`);
+        weak.push({ subject: s.name, chapter: ch, percent: stats.percent, missing });
+      }
+      progressSum += stats.percent;
+    });
+  });
+
+  const todayRevs = getTodayRevisions().filter(r => !r.done).length;
+  const upcoming = getUpcomingRevisions().length;
+
+  return {
+    overallPercent: totalChapters ? Math.round(progressSum / totalChapters) : 0,
+    totalChapters,
+    completedChapters,
+    todayRevisions: todayRevs,
+    upcomingRevisions: upcoming,
+    plannerItems: loadPlanner().length,
+    weakTopics: weak.sort((a, b) => a.percent - b.percent).slice(0, 6)
+  };
+}
+
+function renderAnalytics() {
+  const stats = getDashboardStats();
+  document.getElementById('analytics-progress').textContent = `${stats.overallPercent}%`;
+  document.getElementById('analytics-chapters').textContent = `${stats.completedChapters} / ${stats.totalChapters}`;
+  document.getElementById('analytics-revisions').textContent = `${stats.todayRevisions} today · ${stats.upcomingRevisions} soon`;
+}
+
+function renderWeakTopics() {
+  const grid = document.getElementById('weak-grid');
+  const manualTopics = loadWeakTopics();
+  if (manualTopics.length) {
+    grid.innerHTML = manualTopics.map(item => `
+      <div class="weak-card">
+        <h3>${item.subject || 'Custom topic'}</h3>
+        <div class="weak-item">
+          <div>
+            <div class="weak-item-title">${item.title}</div>
+            ${item.subject ? `<div class="weak-item-sub">Subject: ${item.subject}</div>` : ''}
+          </div>
+          <button class="weak-item-delete" onclick="deleteWeakTopic(${item.id})">✕</button>
+        </div>
+      </div>
+    `).join('');
+    return;
+  }
+
+  grid.innerHTML = '<div class="weak-card"><h3>No weak topics found</h3><div class="weak-item-sub">Add your own weak topics using the box above.</div></div>';
+}
+
+function loadPlanner() {
+  try { return JSON.parse(localStorage.getItem(PLANNER_KEY)) || []; } catch { return []; }
+}
+function savePlanner(items) { localStorage.setItem(PLANNER_KEY, JSON.stringify(items)); }
+
+function loadWeakTopics() {
+  try { return JSON.parse(localStorage.getItem(WEAK_TOPICS_KEY)) || []; } catch { return []; }
+}
+function saveWeakTopics(items) { localStorage.setItem(WEAK_TOPICS_KEY, JSON.stringify(items)); }
+
+function addWeakTopic() {
+  const input = document.getElementById('weak-input');
+  const subject = document.getElementById('weak-subject').value;
+  const title = input.value.trim();
+  if (!title) return;
+  const items = loadWeakTopics();
+  items.push({ id: Date.now(), title, subject });
+  saveWeakTopics(items);
+  input.value = '';
+  document.getElementById('weak-subject').value = '';
+  renderWeakTopics();
+}
+
+function deleteWeakTopic(id) {
+  const items = loadWeakTopics().filter(item => item.id !== id);
+  saveWeakTopics(items);
+  renderWeakTopics();
+}
+
+function clearWeakTopics() {
+  if (!confirm('Clear all weak topics?')) return;
+  localStorage.removeItem(WEAK_TOPICS_KEY);
+  renderWeakTopics();
+}
+
+function renderPlanner() {
+  const list = document.getElementById('planner-list');
+  const items = loadPlanner();
+  if (!items.length) {
+    list.innerHTML = '<div class="weak-item-sub">No planner items yet. Add something quick or type your study plan.</div>';
+    renderCompletedPlanner();
+    return;
+  }
+  list.innerHTML = items.map(item => `
+    <div class="planner-item ${item.done ? 'done' : ''}" onclick="togglePlannerItem(${item.id})">
+      <div class="planner-item-text ${item.done ? 'done' : ''}">
+        ${item.text}
+        <div class="planner-item-date">${item.date || 'today'}</div>
+      </div>
+      <div class="planner-item-actions">
+        <button class="planner-item-toggle ${item.done ? 'done' : ''}">${item.done ? '✓' : '○'}</button>
+        <button class="planner-item-delete" onclick="event.stopPropagation(); deletePlannerItem(${item.id})">✕</button>
+      </div>
+    </div>
+  `).join('');
+  renderCompletedPlanner();
+}
+
+function addPlannerItem() {
+  const input = document.getElementById('planner-input');
+  const text = input.value.trim();
+  if (!text) return;
+  const items = loadPlanner();
+  items.push({ id: Date.now(), text, done: false, date: TODAY });
+  savePlanner(items);
+  input.value = '';
+  renderPlanner();
+  renderAnalytics();
+}
+
+function addPlannerTemplate(text) {
+  const items = loadPlanner();
+  items.push({ id: Date.now(), text, done: false, date: TODAY });
+  savePlanner(items);
+  renderPlanner();
+  renderAnalytics();
+}
+
+function promptPlannerQuestions() {
+  const count = prompt('How many questions do you want to practice?', '10');
+  if (!count) return;
+  const text = `${count.trim()} questions`;
+  addPlannerTemplate(text);
+}
+
+function promptPlannerCount(label, prefix) {
+  const count = prompt(`Enter ${label} day number`, '1');
+  if (!count) return;
+  const text = `${prefix === 'rev' ? `Revision day ${count.trim()}` : `${count.trim()} ${label}`}`;
+  addPlannerTemplate(text);
+}
+
+function loadDarkMode() {
+  return localStorage.getItem(DARK_MODE_KEY) === 'true';
+}
+
+function saveDarkMode(value) {
+  localStorage.setItem(DARK_MODE_KEY, value ? 'true' : 'false');
+}
+
+function applyDarkMode() {
+  const enabled = loadDarkMode();
+  document.body.classList.toggle('dark-mode', enabled);
+  const darkButton = document.querySelector('.header-btn[onclick="toggleDarkMode()"]');
+  if (darkButton) darkButton.textContent = enabled ? '☀️ Light' : '🌙 Dark';
+}
+
+function toggleDarkMode() {
+  const enabled = !loadDarkMode();
+  saveDarkMode(enabled);
+  applyDarkMode();
+}
+
+function renderCompletedPlanner() {
+  const container = document.getElementById('planner-completed-panel');
+  if (!container) return;
+  const completed = loadPlanner().filter(item => item.done);
+  if (!completed.length) {
+    container.innerHTML = '<div class="planner-completed-panel"><h4>Completed planner items</h4><div class="weak-item-sub">No completed items yet.</div></div>';
+    return;
+  }
+  container.innerHTML = `<div class="planner-completed-panel"><h4>Completed planner items (${completed.length})</h4>${completed.map(item => `
+      <div class="planner-completed-item">
+        <div class="planner-completed-item-text">${item.text}</div>
+        <div class="planner-completed-item-date">${item.date || 'today'}</div>
+      </div>
+    `).join('')}</div>`;
+}
+
+function toggleCompletedPlannerSection() {
+  const panel = document.getElementById('planner-completed-panel');
+  const button = document.getElementById('planner-past-btn');
+  if (!panel) return;
+  panel.hidden = !panel.hidden;
+  if (!panel.hidden) renderCompletedPlanner();
+  if (button) button.textContent = panel.hidden ? 'Show Past Planner' : 'Hide Past Planner';
+}
+
+function togglePlannerItem(id) {
+  const items = loadPlanner();
+  const item = items.find(i => i.id === id);
+  if (!item) return;
+  item.done = !item.done;
+  savePlanner(items);
+  renderPlanner();
+  renderAnalytics();
+}
+
+function deletePlannerItem(id) {
+  const items = loadPlanner().filter(i => i.id !== id);
+  savePlanner(items);
+  renderPlanner();
+  renderAnalytics();
+}
+
 function loadTasks() {
   try { return JSON.parse(localStorage.getItem(TASKS_KEY)) || []; } catch { return []; }
 }
@@ -404,6 +811,7 @@ function addTask() {
   saveTasks(tasks);
   input.value = '';
   renderTasks();
+  renderAnalytics();
 }
 
 function toggleTask(id) {
@@ -413,12 +821,14 @@ function toggleTask(id) {
   task.done = !task.done;
   saveTasks(tasks);
   renderTasks();
+  renderAnalytics();
 }
 
 function deleteTask(id) {
   const tasks = loadTasks().filter(t => t.id !== id);
   saveTasks(tasks);
   renderTasks();
+  renderAnalytics();
 }
 
 function renderTasks() {
@@ -470,6 +880,8 @@ function saveSettings() {
   });
   closeSettings();
   renderSubjects();
+  renderAnalytics();
+  renderWeakTopics();
   alert('Lecture counts saved.');
 }
 
@@ -535,9 +947,13 @@ function resetAll() {
   }, 300);
 }
 
+applyDarkMode();
 renderSubjects();
 renderRevisions();
 renderTasks();
+renderAnalytics();
+renderWeakTopics();
+renderPlanner();
 </script>
 </body>
 </html>

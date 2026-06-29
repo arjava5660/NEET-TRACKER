@@ -269,6 +269,15 @@ function load() {
 }
 function save(data) { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
 
+function getChapterLecCount(chIndex) {
+  const data = load();
+  const lecKey = `ch${chIndex}_lec_count`;
+  const stored = data[lecKey];
+  if (typeof stored === 'number') return stored;
+  if (typeof stored === 'string' && stored !== '') return Number(stored);
+  return CHAPTERS[chIndex]?.lec || 10;
+}
+
 function getOpenChapterIndex() {
   try {
     const value = Number(localStorage.getItem(OPEN_CHAPTER_KEY));
@@ -302,8 +311,8 @@ function revKey(ci, day) { return `ch${ci}_rev_d${day}`; }
 
 // Check if dropdown-1 is fully done (lec + dpp + kneet + pyqneet + pyqjee)
 function isDropdown1Complete(ci, data) {
-  const ch = CHAPTERS[ci];
-  for (let i = 0; i < ch.lec; i++) {
+  const lc = getChapterLecCount(ci);
+  for (let i = 0; i < lc; i++) {
     if (!data[gk(ci,"lec",i)]) return false;
     if (!data[gk(ci,"dpp",i)]) return false;
   }
@@ -334,7 +343,7 @@ function render() {
   let totalBoxes = 0, doneBoxes = 0;
 
   CHAPTERS.forEach((ch, ci) => {
-    const lc = ch.lec;
+    const lc = getChapterLecCount(ci);
     const completed1 = isDropdown1Complete(ci, data);
     let compDate = data[compKey(ci)];
     if (completed1 && !compDate) {
@@ -558,8 +567,7 @@ function toggleRev(ci, day) {
 
 /* ── UPDATE SINGLE CARD ── */
 function updateCard(ci, data) {
-  const ch = CHAPTERS[ci];
-  const lc = ch.lec;
+  const lc = getChapterLecCount(ci);
   const completed1 = isDropdown1Complete(ci, data);
   const compDate = data[compKey(ci)];
 
@@ -634,7 +642,7 @@ function updateCard(ci, data) {
 function updateOverall(data) {
   let totalBoxes = 0, doneBoxes = 0;
   CHAPTERS.forEach((ch, ci) => {
-    const lc = ch.lec;
+    const lc = getChapterLecCount(ci);
     let chTotal = lc + lc + 2 + 2 + 1 + REV_DAYS.length;
     let chDone = 0;
     for (let i = 0; i < lc; i++) { if (data[gk(ci,"lec",i)]) chDone++; }

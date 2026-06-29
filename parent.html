@@ -413,6 +413,14 @@ const PLANNER_KEY = 'neet_planner';
 const WEAK_TOPICS_KEY = 'neet_weak_topics';
 const DARK_MODE_KEY = 'neet_dark_mode';
 const REV_DAYS = [1, 3, 5, 8, 15, 30, 50];
+const DEFAULT_LECTURE_COUNTS = {
+  neet_phy: [7,7,2,11,8,10,8,9,14,2,1,12,8,3,2,13,6,9,7,8,8,8,2,6,5,2,9,2,3,3,3,3],
+  neet_chem_physical: [6,15,10,6,8,5,10,7,10,1],
+  neet_chem_organic: [11,18,15,17,10,8,11,4,5,1],
+  neet_chem_inorganic: [12,16,5,5,5,13],
+  neet_botany: [9,7,3,6,7,6,6,6,6,4,8,4,2,2,2,13,11],
+  neet_zoology: [13,7,6,7,8,6,6,7,6,7,4,6,8,5,4]
+};
 
 function addDays(dateStr, days) {
   const d = new Date(dateStr);
@@ -428,9 +436,9 @@ function getChapterLecCount(subjectKey, chIndex) {
   const data = getSubjectData(subjectKey);
   const lecKey = `ch${chIndex}_lec_count`;
   if (typeof data[lecKey] === 'number') return data[lecKey];
-  if (data[lecKey]) return Number(data[lecKey]) || 10;
-  const def = CHAPTER_DEFS[subjectKey] && CHAPTER_DEFS[subjectKey][chIndex];
-  return def ? 10 : 10;
+  if (data[lecKey]) return Number(data[lecKey]);
+  const defaults = DEFAULT_LECTURE_COUNTS[subjectKey] || [];
+  return defaults[chIndex] || 10;
 }
 
 function calculateProgress(subjectKey) {
@@ -874,7 +882,9 @@ function saveSettings() {
     chapters.forEach((_, ci) => {
       const input = document.getElementById(`lec-${s.key}-${ci}`);
       if (!input) return;
-      data[`ch${ci}_lec_count`] = Number(input.value) || 10;
+      const parsed = Number(input.value);
+      const defaultCount = getChapterLecCount(s.key, ci);
+      data[`ch${ci}_lec_count`] = Number.isInteger(parsed) && parsed > 0 ? parsed : defaultCount;
     });
     localStorage.setItem(s.key, JSON.stringify(data));
   });

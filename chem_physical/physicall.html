@@ -236,11 +236,38 @@ const CHAPTERS = [
 
 const REV_DAYS = [1, 3, 5, 8, 15, 30, 50];
 const STORE_KEY = "neet_chem_physical";
+const OPEN_CHAPTER_KEY = `${STORE_KEY}_open_chapter`;
 
 function load() {
   try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { return {}; }
 }
 function save(data) { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+
+function getOpenChapterIndex() {
+  try {
+    const value = Number(localStorage.getItem(OPEN_CHAPTER_KEY));
+    return Number.isInteger(value) && value >= 0 && value < CHAPTERS.length ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function setOpenChapterIndex(ci) {
+  if (ci === null || ci === undefined) {
+    localStorage.removeItem(OPEN_CHAPTER_KEY);
+  } else {
+    localStorage.setItem(OPEN_CHAPTER_KEY, String(ci));
+  }
+}
+
+function restoreExpandedChapter() {
+  const openCi = getOpenChapterIndex();
+  if (openCi === null) return;
+  const body = document.getElementById(`cbody-${openCi}`);
+  const chev = document.getElementById(`chev-${openCi}`);
+  if (body) body.classList.add("open");
+  if (chev) chev.classList.add("open");
+}
 
 function gk(ci, type, idx) { return `ch${ci}_${type}_${idx}`; }
 function compKey(ci) { return `ch${ci}_completedDate`; }
@@ -450,6 +477,8 @@ function render() {
     main.appendChild(card);
   });
 
+  restoreExpandedChapter();
+
   const overallPct = totalBoxes ? Math.round(doneBoxes / totalBoxes * 100) : 0;
   document.getElementById("overall-bar").style.width = overallPct + "%";
   document.getElementById("overall-pct").textContent = overallPct + "%";
@@ -567,8 +596,12 @@ function updateOverall(data) {
 }
 
 function toggleBody(ci) {
-  document.getElementById("cbody-" + ci).classList.toggle("open");
-  document.getElementById("chev-" + ci).classList.toggle("open");
+  const body = document.getElementById("cbody-" + ci);
+  const chev = document.getElementById("chev-" + ci);
+  const isOpen = body.classList.contains("open");
+  body.classList.toggle("open", !isOpen);
+  chev.classList.toggle("open", !isOpen);
+  setOpenChapterIndex(!isOpen ? ci : null);
 }
 function togglePlanner(ci) {
   document.getElementById("pbody-" + ci).classList.toggle("open");

@@ -166,8 +166,8 @@
   .check-box.done-lec      { background: var(--blue-bg);    border-color: var(--blue);   }
   .check-box.done-dpp      { background: var(--green-bg);   border-color: var(--green);  }
   .check-box.done-kneet    { background: var(--purple-bg);  border-color: var(--purple); }
-  .check-box.done-pyq-neet { background: var(--amber-bg);   border-color: var(--amber);  }
-  .check-box.done-pyq-jee  { background: var(--red-bg);     border-color: var(--red);    }
+  .check-box.done-pyq-neet { background: transparent; border-color: var(--border2); }
+  .check-box.done-pyq-jee  { background: transparent; border-color: var(--border2); }
   .check-box.done-ncert    { background: var(--teal-bg);    border-color: var(--teal);   }
   .check-box.done-neetflex { background: var(--pink-bg);    border-color: var(--pink);   }
   .check-box.done-rev      { background: var(--orange-bg);  border-color: var(--orange); }
@@ -499,10 +499,10 @@ function render() {
               </div>
               <div class="book-item">
                 <div class="book-box ${data[gk(ci,"neetflex",0)]?"done-neetflex":""}" id="chk-neetflex-${ci}"
-                  onclick="toggle(${ci},'neetflex',0)" title="NEET Flex Read">
+                  onclick="toggle(${ci},'neetflex',0)" title="NCERT PUNCH Read">
                   <svg class="tick" width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#8e2d5b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
-                <div class="book-desc">NEET Flex</div>
+                <div class="book-desc">NCERT PUNCH</div>
               </div>
             </div>
           </div>

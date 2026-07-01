@@ -181,7 +181,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
   .planner-completed-item:last-child { border-bottom: none; }
   .planner-completed-item-text { font-size: 13px; color: var(--text); }
   .planner-completed-item-date { font-size: 12px; color: var(--muted); }
-}
 </style>
 </head>
 <body>
@@ -231,31 +230,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
   </div>
 
   <div class="section">
-    <div class="section-title">�️ Daily Planner</div>
-    <div class="planner-panel">
-      <div class="planner-head">
-        <div>
-          <div class="planner-title">Plan your study session</div>
-          <div class="planner-desc">Type a note or add quick builds like lectures, DPP, and questions.</div>
-        </div>
-      </div>
-      <div class="planner-input-row">
-        <input type="text" class="planner-input" id="planner-input" placeholder="Write a planner note, e.g. '3 lec + 10 ques'" onkeypress="if(event.key==='Enter') addPlannerItem()">
-        <button class="planner-add" onclick="addPlannerItem()">Add</button>
-      </div>
-      <div class="planner-buttons">
-        <button class="planner-button" onclick="addPlannerTemplate('3 lec')">3 LEC</button>
-        <button class="planner-button" onclick="addPlannerTemplate('2 lec')">2 LEC</button>
-        <button class="planner-button" onclick="addPlannerTemplate('DPP of that lec')">DPP OF THAT LEC</button>
-        <button class="planner-button" onclick="promptPlannerQuestions()">QUESTIONS...</button>
-        <button class="planner-button" onclick="window.location.href='past_planner.html'">OPEN PAST PLANNER</button>
-      </div>
-      <div class="planner-list" id="planner-list"></div>
-      <div class="planner-completed-panel" id="planner-completed-panel" hidden></div>
-    </div>
-  </div>
-
-  <div class="section">
     <div class="section-title">🔥 Weak Topics</div>
     <div class="weak-control-row">
       <input type="text" id="weak-input" class="weak-control-input" placeholder="Add weak topic name" />
@@ -277,15 +251,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
   <div class="section">
     <div class="section-title">🔁 Today's Revision Schedule</div>
     <div class="rev-list" id="rev-list"></div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">✅ Today's Tasks</div>
-    <div class="task-list" id="task-list"></div>
-    <div class="task-add">
-      <input type="text" class="task-input" id="task-input" placeholder="Add a task..." onkeypress="if(event.key==='Enter')addTask()">
-      <button class="task-btn" onclick="addTask()">+ Add</button>
-    </div>
   </div>
 
   <div class="section">
@@ -960,10 +925,8 @@ function resetAll() {
 applyDarkMode();
 renderSubjects();
 renderRevisions();
-renderTasks();
 renderAnalytics();
 renderWeakTopics();
-renderPlanner();
 </script>
 </body>
 </html>

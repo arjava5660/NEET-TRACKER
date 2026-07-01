@@ -145,6 +145,13 @@
   .section-block:last-child { border-bottom: none; }
   .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
 
+  .dpp-edit-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 12px; background: linear-gradient(90deg, rgba(230,244,234,0.35), rgba(255,255,255,0.85)); }
+  .dpp-edit-controls { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .dpp-edit-input { width: 58px; padding: 4px 8px; border: none; border-radius: 999px; font-size: 12px; text-align: center; background: transparent; color: var(--text); }
+  .dpp-edit-input:focus { outline: none; }
+  .dpp-edit-btn { padding: 4px 10px; border: 1px solid var(--green-border); background: var(--green-bg); color: var(--green); border-radius: 999px; cursor: pointer; font-size: 11px; font-weight: 700; }
+  .dpp-edit-btn:hover { background: #dff5e5; }
+
   .check-grid { display: flex; flex-wrap: wrap; gap: 8px; }
   .check-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .check-box { width: 34px; height: 34px; border-radius: var(--radius-sm); border: 1.5px solid var(--border2); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.15s; }
@@ -252,6 +259,34 @@ function getChapterLecCount(chIndex) {
   return CHAPTERS[chIndex]?.lec || 10;
 }
 
+function getChapterDppCount(chIndex) {
+  const data = load();
+  const dppKey = `ch${chIndex}_dpp_count`;
+  const stored = data[dppKey];
+  if (typeof stored === 'number') return stored;
+  if (typeof stored === 'string' && stored !== '') return Number(stored);
+  const chapter = CHAPTERS[chIndex];
+  if (chapter && typeof chapter.dpp !== 'undefined') return chapter.dpp;
+  if (chapter && typeof chapter.lec !== 'undefined') return chapter.lec;
+  return 10;
+}
+
+function getDppLabels(chIndex, dppCount) {
+  const base = CHAPTERS[chIndex]?.dppLabels || [];
+  return Array.from({ length: dppCount }, (_, i) => base[i] || `DPP ${i + 1}`);
+}
+
+function saveChapterDppCount(chIndex) {
+  const data = load();
+  const input = document.getElementById(`dpp-count-${chIndex}`);
+  const parsed = Number(input?.value);
+  const fallback = getChapterDppCount(chIndex);
+  const nextCount = Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+  data[`ch${chIndex}_dpp_count`] = nextCount;
+  save(data);
+  render();
+}
+
 function getOpenChapterIndex() {
   try {
     const value = Number(localStorage.getItem(OPEN_CHAPTER_KEY));
@@ -315,6 +350,7 @@ function render() {
 
   CHAPTERS.forEach((ch, ci) => {
     const lc = getChapterLecCount(ci);
+    const dppCount = getChapterDppCount(ci);
     const completed1 = isDropdown1Complete(ci, data);
     let compDate = data[compKey(ci)];
     if (completed1 && !compDate) {
@@ -323,7 +359,7 @@ function render() {
       save(data);
     }
 
-    let chTotal = lc + lc + 2 + 2 + 1 + REV_DAYS.length;
+    let chTotal = lc + dppCount + 2 + 2 + 1 + REV_DAYS.length;
     let chDone = 0;
     for (let i = 0; i < lc; i++) { if (data[gk(ci, "lec", i)]) chDone++; }
     for (let i = 0; i < lc; i++) { if (data[gk(ci, "dpp", i)]) chDone++; }
@@ -339,7 +375,8 @@ function render() {
 
     const pct = chTotal ? Math.round(chDone / chTotal * 100) : 0;
     const lecDone = Array.from({ length: lc }, (_, i) => data[gk(ci, "lec", i)]).filter(Boolean).length;
-    const dppDone = Array.from({ length: lc }, (_, i) => data[gk(ci, "dpp", i)]).filter(Boolean).length;
+    const dppDone = Array.from({ length: dppCount }, (_, i) => data[gk(ci, "dpp", i)]).filter(Boolean).length;
+    const dppLabels = getDppLabels(ci, dppCount);
     const knDone = [0, 1].filter(i => data[gk(ci, "kneet", i)]).length;
     const pyqND = data[gk(ci, "pyqneet", 0)] ? 1 : 0;
     const pyqJD = data[gk(ci, "pyqjee", 0)] ? 1 : 0;
@@ -349,7 +386,7 @@ function render() {
       const locked = !compDate;
       return `<div class="rev-item">
         <div class="rev-box ${done ? "done-rev" : ""} ${locked ? "rev-locked-box" : ""}"
-          onclick="${locked ? "" : `toggleRev(${ci},${day})`}"
+          onclick="${locked ? "" : 'toggleRev(' + ci + ',' + day + ')'}"
           title="Day ${day} revision${targetDate ? " — " + formatDate(targetDate) : ""}">
           <svg class="tick" width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path d="M3 8l3.5 3.5L13 5" stroke="#8a3a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -398,15 +435,22 @@ function render() {
         </div>
 
         <div class="section-block">
-          <div class="section-label">📝 DPP <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--hint)">(${lc} total)</span></div>
+          <div class="dpp-edit-row">
+            <div class="section-label">📝 DPP <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--hint)">(${dppCount} total)</span></div>
+            <div class="dpp-edit-controls">
+              <input type="number" class="dpp-edit-input" id="dpp-count-${ci}" value="${dppCount}" min="1" max="20">
+              <button class="dpp-edit-btn" onclick="saveChapterDppCount(${ci})">Edit</button>
+            </div>
+          </div>
           <div class="check-grid">
-            ${Array.from({ length: lc }, (_, i) => {
+            ${Array.from({ length: dppCount }, (_, i) => {
               const done = data[gk(ci, "dpp", i)];
+              const label = dppLabels[i] || `D${i+1}`;
               return `<div class="check-item">
-                <div class="check-box ${done ? "done-dpp" : ""}" id="chk-dpp-${ci}-${i}" onclick="toggle(${ci},'dpp',${i})" title="DPP ${i+1}">
+                <div class="check-box ${done ? "done-dpp" : ""}" id="chk-dpp-${ci}-${i}" onclick="toggle(${ci},'dpp',${i})" title="${label}">
                   <svg class="tick" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8l3.5 3.5L13 5" stroke="#2a7a3b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
-                <span class="check-label">D${i+1}</span>
+                <span class="check-label">${label}</span>
               </div>`;
             }).join("")}
           </div>
@@ -516,12 +560,13 @@ function toggleRev(ci, day) {
 
 function updateCard(ci, data) {
   const lc = getChapterLecCount(ci);
+  const dppCount = getChapterDppCount(ci);
   const completed1 = isDropdown1Complete(ci, data);
   const compDate = data[compKey(ci)];
 
   const typeMap = [
     ...Array.from({ length: lc }, (_, i) => ({ type: "lec", i, cls: "done-lec", el: `chk-lec-${ci}-${i}` })),
-    ...Array.from({ length: lc }, (_, i) => ({ type: "dpp", i, cls: "done-dpp", el: `chk-dpp-${ci}-${i}` })),
+    ...Array.from({ length: dppCount }, (_, i) => ({ type: "dpp", i, cls: "done-dpp", el: `chk-dpp-${ci}-${i}` })),
     { type: "kneet", i: 0, cls: "done-kneet", el: `chk-kneet-${ci}-0` },
     { type: "kneet", i: 1, cls: "done-kneet", el: `chk-kneet-${ci}-1` },
     { type: "pyqneet", i: 0, cls: "done-pyq-neet", el: `chk-pyqneet-${ci}` },
@@ -558,7 +603,7 @@ function updateCard(ci, data) {
       const locked = !compDate;
       return `<div class="rev-item">
         <div class="rev-box ${done ? "done-rev" : ""} ${locked ? "rev-locked-box" : ""}"
-          onclick="${locked ? "" : `toggleRev(${ci},${day})`}"
+          onclick="${locked ? "" : 'toggleRev(' + ci + ',' + day + ')'}"
           title="Day ${day} revision${targetDate ? " — " + formatDate(targetDate) : ""}">
           <svg class="tick" width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path d="M3 8l3.5 3.5L13 5" stroke="#8a3a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -572,7 +617,7 @@ function updateCard(ci, data) {
     }).join("");
   }
 
-  let chTotal = lc + lc + 2 + 2 + 1 + REV_DAYS.length;
+  let chTotal = lc + dppCount + 2 + 2 + 1 + REV_DAYS.length;
   let chDone = lecDone + dppDone + knDone + pyqND + pyqJD;
   if (data[gk(ci, "ncert", 0)]) chDone++;
   REV_DAYS.forEach(d => { if (data[revKey(ci, d)]) chDone++; });
@@ -585,7 +630,8 @@ function updateOverall(data) {
   let totalBoxes = 0, doneBoxes = 0;
   CHAPTERS.forEach((ch, ci) => {
     const lc = getChapterLecCount(ci);
-    let chTotal = lc + lc + 2 + 2 + 1 + REV_DAYS.length;
+    const dppCount = getChapterDppCount(ci);
+    let chTotal = lc + dppCount + 2 + 2 + 1 + REV_DAYS.length;
     let chDone = 0;
     for (let i = 0; i < lc; i++) { if (data[gk(ci, "lec", i)]) chDone++; }
     for (let i = 0; i < lc; i++) { if (data[gk(ci, "dpp", i)]) chDone++; }
